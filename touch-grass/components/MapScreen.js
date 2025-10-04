@@ -4,7 +4,6 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
 import axios from "axios";
 
-// Backend endpoint (replace with your deployed serverless function)
 const BACKEND_URL = "https://touch-grass-dijwixvrb-elizabethl04s-projects.vercel.app/api/nearby";
 
 export default function MapScreen() {
@@ -13,32 +12,27 @@ export default function MapScreen() {
   const [loading, setLoading] = useState(true);
   const [fetching, setFetching] = useState(false);
 
-  // Get user location
   useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
+      const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        alert("Permission denied for location access");
+        alert("Location permission denied");
         return;
       }
 
-      let loc = await Location.getCurrentPositionAsync({});
-      setLocation({
-        latitude: loc.coords.latitude,
-        longitude: loc.coords.longitude,
-      });
+      const loc = await Location.getCurrentPositionAsync({});
+      setLocation({ latitude: loc.coords.latitude, longitude: loc.coords.longitude });
       setLoading(false);
     })();
   }, []);
 
-  // Fetch nearby grass spots via backend
   const fetchNearbyGrass = async () => {
     if (!location) return;
-
     setFetching(true);
     try {
       const res = await axios.get(`${BACKEND_URL}?lat=${location.latitude}&lng=${location.longitude}`);
-      setPlaces(res.data); // backend returns top 5 spots
+      setPlaces(res.data);
+      if (res.data.length === 0) alert("No nearby parks found. Try expanding your search radius.");
     } catch (err) {
       console.error(err);
       alert("Failed to fetch nearby grass spots.");
@@ -60,20 +54,13 @@ export default function MapScreen() {
       <MapView
         style={styles.map}
         provider={PROVIDER_GOOGLE}
-        initialRegion={{
-          ...location,
-          latitudeDelta: 0.02,
-          longitudeDelta: 0.02,
-        }}
+        initialRegion={{ ...location, latitudeDelta: 0.02, longitudeDelta: 0.02 }}
       >
         <Marker coordinate={location} title="You are here!" />
-        {places.map((p) => (
+        {places.map(p => (
           <Marker
             key={p.place_id}
-            coordinate={{
-              latitude: p.geometry.location.lat,
-              longitude: p.geometry.location.lng,
-            }}
+            coordinate={{ latitude: p.geometry.location.lat, longitude: p.geometry.location.lng }}
             title={p.name}
             description={p.vicinity}
           />
@@ -83,7 +70,7 @@ export default function MapScreen() {
       <Button
         title={fetching ? "Finding Grass..." : "Find Nearby Grass 🌿"}
         onPress={fetchNearbyGrass}
-        disabled={fetching}
+        disabled={fetching || !location}
       />
     </View>
   );
