@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { lat, lng } = req.query;
+  const { lat, lng, radius } = req.query;
 
   if (!lat || !lng) {
     return res.status(400).json({ error: "Missing lat or lng query parameter" });
@@ -16,7 +16,10 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Google API key not configured on server" });
   }
 
-  const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=20000&type=park&key=${GOOGLE_API_KEY}`;
+  // Use user-provided radius, or default to 50 km
+  const searchRadius = radius ? parseInt(radius) : 5;
+
+const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${searchRadius}&type=park&keyword=park&key=${GOOGLE_API_KEY}`;
 
   try {
     const { data } = await axios.get(url);

@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, StyleSheet, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  Button,
+  StyleSheet,
+  ActivityIndicator,
+  TextInput,
+} from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
 import axios from "axios";
@@ -11,6 +18,7 @@ export default function MapScreen() {
   const [places, setPlaces] = useState([]);
   const [loading, setLoading] = useState(true);
   const [fetching, setFetching] = useState(false);
+  const [radius, setRadius] = useState("5"); // default 5 meters
 
   useEffect(() => {
     (async () => {
@@ -21,7 +29,10 @@ export default function MapScreen() {
       }
 
       const loc = await Location.getCurrentPositionAsync({});
-      setLocation({ latitude: loc.coords.latitude, longitude: loc.coords.longitude });
+      setLocation({
+        latitude: loc.coords.latitude,
+        longitude: loc.coords.longitude,
+      });
       setLoading(false);
     })();
   }, []);
@@ -30,14 +41,20 @@ export default function MapScreen() {
     if (!location) return;
     setFetching(true);
     try {
-      const res = await axios.get(`${BACKEND_URL}?lat=${location.latitude}&lng=${location.longitude}`);
+      const res = await axios.get(
+        `${BACKEND_URL}?lat=${location.latitude}&lng=${location.longitude}&radius=${radius}`
+      );
       setPlaces(res.data);
-      if (res.data.length === 0) alert("No nearby parks found. Try expanding your search radius.");
+      if (res.data.length === 0)
+        alert(
+          "No nearby parks found. Try expanding your search radius or moving closer."
+        );
     } catch (err) {
       console.error(err);
       alert("Failed to fetch nearby grass spots.");
+    } finally {
+      setFetching(false);
     }
-    setFetching(false);
   };
 
   if (loading) {
@@ -54,24 +71,40 @@ export default function MapScreen() {
       <MapView
         style={styles.map}
         provider={PROVIDER_GOOGLE}
-        initialRegion={{ ...location, latitudeDelta: 0.02, longitudeDelta: 0.02 }}
+        initialRegion={{
+          ...location,
+          latitudeDelta: 0.02,
+          longitudeDelta: 0.02,
+        }}
       >
         <Marker coordinate={location} title="You are here!" />
-        {places.map(p => (
+        {places.map((p) => (
           <Marker
             key={p.place_id}
-            coordinate={{ latitude: p.geometry.location.lat, longitude: p.geometry.location.lng }}
+            coordinate={{
+              latitude: p.geometry.location.lat,
+              longitude: p.geometry.location.lng,
+            }}
             title={p.name}
             description={p.vicinity}
           />
         ))}
       </MapView>
 
-      <Button
-        title={fetching ? "Finding Grass..." : "Find Nearby Grass 🌿"}
-        onPress={fetchNearbyGrass}
-        disabled={fetching || !location}
-      />
+      <View style={styles.controls}>
+        <TextInput
+          style={styles.input}
+          value={radius}
+          onChangeText={setRadius}
+          keyboardType="numeric"
+          placeholder="Radius in kilometers"
+        />
+        <Button
+          title={fetching ? "Finding Grass..." : "Find Nearby Grass 🌿"}
+          onPress={fetchNearbyGrass}
+          disabled={fetching || !location}
+        />
+      </View>
     </View>
   );
 }
@@ -80,4 +113,12 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#E8F5E9" },
   map: { flex: 1, margin: 10 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  controls: { padding: 10, backgroundColor: "#fff" },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 8,
+    marginBottom: 10,
+    borderRadius: 5,
+  },
 });
