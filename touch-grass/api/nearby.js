@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   }
 
   // Use a larger radius and remove keyword to avoid ZERO_RESULTS
-  const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=5000&type=park&key=${GOOGLE_API_KEY}`;
+  const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=1000000&type=park&key=${GOOGLE_API_KEY}`;
 
   try {
     const response = await axios.get(url);
