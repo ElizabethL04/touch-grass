@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "touch-grass",
+    "slug": "touch-grass",
+    "version": "1.0.0",
+    "ios": {
+      "config": {
+        "googleMapsApiKey": "AIzaSyD0I1pWqs47vlpHEms2nV7Ou3qoDI90ipA"
+      }
+    },
+    "android": {
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyD0I1pWqs47vlpHEms2nV7Ou3qoDI90ipA"
+        }
+      }
+    }
+  }
+}
