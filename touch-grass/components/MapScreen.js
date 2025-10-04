@@ -4,7 +4,8 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
 import axios from "axios";
 
-const BACKEND_URL = "https://your-backend.vercel.app/api/nearby"; // replace with your API
+// Backend endpoint (replace with your deployed serverless function)
+const BACKEND_URL = "https://touch-grass-dijwixvrb-elizabethl04s-projects.vercel.app/api/nearby";
 
 export default function MapScreen() {
   const [location, setLocation] = useState(null);
@@ -12,6 +13,7 @@ export default function MapScreen() {
   const [loading, setLoading] = useState(true);
   const [fetching, setFetching] = useState(false);
 
+  // Get user location
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -29,12 +31,14 @@ export default function MapScreen() {
     })();
   }, []);
 
+  // Fetch nearby grass spots via backend
   const fetchNearbyGrass = async () => {
     if (!location) return;
+
     setFetching(true);
     try {
       const res = await axios.get(`${BACKEND_URL}?lat=${location.latitude}&lng=${location.longitude}`);
-      setPlaces(res.data);
+      setPlaces(res.data); // backend returns top 5 spots
     } catch (err) {
       console.error(err);
       alert("Failed to fetch nearby grass spots.");
