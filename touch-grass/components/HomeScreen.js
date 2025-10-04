@@ -6,6 +6,7 @@ export default function HomeScreen({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.header}>Touch Grass 🌱</Text>
       <Button title="Go to Map" onPress={() => navigation.navigate("Map")} />
+      <Button title="Streaks" onPress={() => navigation.navigate("Streaks")} />
       {/* Add buttons to other screens like Community, Streaks, etc */}
     </View>
   );
