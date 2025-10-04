@@ -16,21 +16,20 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Google API key not configured on server" });
   }
 
-  // Use user-provided radius, or default to 50 km
-  const searchRadius = radius ? parseInt(radius) : 5;
+  // Default radius 500 meters
+  const searchRadius = radius ? parseInt(radius) : 500;
 
-const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${searchRadius}&type=park&keyword=park&key=${GOOGLE_API_KEY}`;
+  const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${searchRadius}&type=park&key=${GOOGLE_API_KEY}`;
 
   try {
     const { data } = await axios.get(url);
 
-    // If API call fails or returns no results
     if (!data.results) {
       console.error("Google API error:", data);
       return res.status(500).json({ error: "Failed to fetch nearby parks" });
     }
 
-    const parks = data.results.slice(0, 5).map((place) => ({
+    const parks = data.results.slice(0, 10).map((place) => ({
       place_id: place.place_id,
       name: place.name,
       vicinity: place.vicinity,

@@ -18,7 +18,7 @@ export default function MapScreen() {
   const [places, setPlaces] = useState([]);
   const [loading, setLoading] = useState(true);
   const [fetching, setFetching] = useState(false);
-  const [radius, setRadius] = useState("5"); // default 5 meters
+  const [radius, setRadius] = useState("500"); // default 500 meters
 
   useEffect(() => {
     (async () => {
@@ -45,10 +45,12 @@ export default function MapScreen() {
         `${BACKEND_URL}?lat=${location.latitude}&lng=${location.longitude}&radius=${radius}`
       );
       setPlaces(res.data);
-      if (res.data.length === 0)
+
+      if (res.data.length === 0) {
         alert(
-          "No nearby parks found. Try expanding your search radius or moving closer."
+          "No nearby parks found. Try increasing the search radius or moving closer."
         );
+      }
     } catch (err) {
       console.error(err);
       alert("Failed to fetch nearby grass spots.");
@@ -97,7 +99,7 @@ export default function MapScreen() {
           value={radius}
           onChangeText={setRadius}
           keyboardType="numeric"
-          placeholder="Radius in kilometers"
+          placeholder="Radius in meters"
         />
         <Button
           title={fetching ? "Finding Grass..." : "Find Nearby Grass 🌿"}
