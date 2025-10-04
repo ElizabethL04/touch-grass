@@ -22,6 +22,10 @@ export default function SignUpScreen({ navigation }) {
             if (!email || !password) {
                 throw new Error("Email and password are required");
             }
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                throw new Error("Please enter a valid email address");
+            }
             await signUp(email, password);
         } catch (error) {
             console.log(error.message);
