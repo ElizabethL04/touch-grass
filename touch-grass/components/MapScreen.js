@@ -4,7 +4,7 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
 import axios from "axios";
 
-const BACKEND_URL = "https://touch-grass-iota.vercel.app/backend/api/nearby";
+const BACKEND_URL = "https://touch-grass-iota.vercel.app/api/nearby";
 
 export default function MapScreen() {
   const [location, setLocation] = useState(null);
