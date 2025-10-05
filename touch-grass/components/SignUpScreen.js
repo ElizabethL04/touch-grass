@@ -1,34 +1,42 @@
 import React, { useEffect, useState } from "react";    
-import {View, Text, TextInput, Button, StyleSheet } from "react-native";
+import {View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { signUp, onStateChange } from "../auth/auth";
 
 export default function SignUpScreen({ navigation }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    //const [currentUser, setCurrentUser] = useState(null);
 
-    useEffect(() => {
+    /*useEffect(() => {
         const changed = onStateChange(user => {
+            setCurrentUser(user);
             if (user) {
                 navigation.replace("Home");
             }
         });
         return changed;
-    }, []);
+    }, []);*/
 
     const handleSignup = async () => {
         setLoading(true);
+
         try {
             if (!email || !password) {
                 throw new Error("Email and password are required");
             }
+            
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 throw new Error("Please enter a valid email address");
             }
+
             await signUp(email, password);
+            AsyncStorage.setItem("savedEmail", email);
+            navigation.replace("Home");
         } catch (error) {
-            console.log(error.message);
+            Alert.alert("Error: ", error.message);
         } finally {
             setLoading(false);
         }

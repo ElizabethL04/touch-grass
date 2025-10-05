@@ -7,6 +7,7 @@ import LoginScreen from "./components/LoginScreen";
 import SignUp from "./components/SignUpScreen";
 import StreakScreen from "./components/StreakScreen";
 import { enableScreens } from 'react-native-screens';
+import LeaderboardScreen from "./components/Leaderboard";
 enableScreens(false);
 
 const Stack = createNativeStackNavigator();
@@ -20,6 +21,7 @@ export default function App() {
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Map" component={MapScreen} />
         <Stack.Screen name="Streaks" component={StreakScreen}/>
+        <Stack.Screen name="Leaderboard" component={LeaderboardScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Switch, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { logIn, onStateChange } from "../auth/auth";
+import { logIn, logOut } from "../auth/auth";
+import { auth } from "../firebaseConfig";
 
 export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState("");
@@ -20,12 +21,14 @@ export default function LoginScreen({ navigation }) {
         loadEmail();
       }, []);
     
-    useEffect(() => {
+    /*useEffect(() => {
         const loggedin = onStateChange(user => {
-          if (user) navigation.replace("Home");
+          if (user) {
+            navigation.replace("Home");
+          }
         });
-        return () => loggedin();
-    }, []);
+        return loggedin;
+    }, []);*/
 
     const handleLogin = async () => {
         setLoading(true);
@@ -34,13 +37,19 @@ export default function LoginScreen({ navigation }) {
                 throw new Error("Email and password required");
             }
 
+            if (auth.currentUser) {
+                await logOut();
+            }
+
             await logIn(email, password);
 
             if (rememberMe) {
-                await AsyncStorage.setEmail("savedEmail", email);
+                await AsyncStorage.setItem("savedEmail", email);
             } else {
                 await AsyncStorage.removeItem("savedEmail");
             }
+
+            navigation.navigate("Home");
         } catch (error) {
             console.log(error.message);
         } finally {
@@ -88,7 +97,7 @@ export default function LoginScreen({ navigation }) {
             />
 
             <Text style={styles.regulartext}>Don't have an account?</Text>
-            <Button title="Signup" onPress={() => navigation.navigate("Signup")} />
+            <Button title="Signup" onPress={() => navigation.replace("Signup")} />
         </View>
     );
 }

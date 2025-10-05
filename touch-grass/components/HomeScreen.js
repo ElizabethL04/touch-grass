@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, Button, StyleSheet } from "react-native";
+import { View, Text, Button, StyleSheet, Alert } from "react-native";
+import { logOut } from "../auth/auth";
 
 export default function HomeScreen({ navigation }) {
   return (
@@ -7,7 +8,8 @@ export default function HomeScreen({ navigation }) {
       <Text style={styles.header}>Touch Grass 🌱</Text>
       <Button title="Go to Map" onPress={() => navigation.navigate("Map")} />
       <Button title="Streaks" onPress={() => navigation.navigate("Streaks")} />
-      {/* Add buttons to other screens like Community, Streaks, etc */}
+      <Button title="Leaderboard" onPress={() => navigation.navigate("Leaderboard")} />
+      <Button title="Logout" onPress={() => {logOut(); navigation.navigate("Login");}} />
     </View>
   );
 }

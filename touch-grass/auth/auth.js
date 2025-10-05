@@ -8,7 +8,11 @@ export async function signUp(email, password) {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    await setDoc(doc(db, "users", user.uid), {email});
+    await setDoc(doc(db, "users", user.uid), {
+      email: user.email,
+      streak: 0,
+    });
+    
     console.log("Registered email: ", email)
     return email;
   } catch (error) {
