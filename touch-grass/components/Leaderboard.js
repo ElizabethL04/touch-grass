@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from "react-native";
-import { db } from "../firebaseConfig";
+import { db, auth } from "../firebaseConfig";
 import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
 
 export default function LeaderboardScreen({ navigation }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [userRank, setUserRank] = useState(null);
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
@@ -19,7 +20,7 @@ export default function LeaderboardScreen({ navigation }) {
           id: doc.id,
           ...doc.data(),
         }));
-        
+        userList.sort((a, b) => b.streak - a.streak);
         setUsers(userList);
       } catch (error) {
         console.error("Error fetching leaderboard:", error);
@@ -30,6 +31,17 @@ export default function LeaderboardScreen({ navigation }) {
     fetchLeaderboard();
   }, []);
 
+  useEffect(() => {
+    const getRanking = () => {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const rank = users.findIndex(user => user.id === currentUser.uid) + 1;
+        setUserRank(rank);
+      }
+    }
+    getRanking();
+  }, [users]);
+
   if (loading) {
     return <ActivityIndicator size="large" style={{ marginTop: 50 }} />;
   };
@@ -37,6 +49,7 @@ export default function LeaderboardScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Leaderboard</Text>
+      <Text style={styles.userRank}>Your place: #{userRank}</Text>
       <FlatList
         data={users}
         keyExtractor={(item) => item.id}
